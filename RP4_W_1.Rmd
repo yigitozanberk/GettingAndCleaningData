@@ -156,10 +156,108 @@ step2 : run the software separately for each sample
 
 step3 : take colum three of outputfile out for each sample and that is the corresponding row in the output data set
 
+## DOWNLOADING DATA
+
+getwd()
+
+setwd()
+relative : setwd("./data") for going one level deeper
+setwd("../") for going one level upwards
+
+absolute : setwd("/Users/username/data/")
+
+file.exists("directoryName") will check to see if the directory exists
+
+dir.create("directoryName") will create a directory if it doesn't exist
+
+if(!file.exists("data")){
+        dir.create("data")
+}
+
+#download.file()
+
+param:
+url
+destfile
+method
+
+useful for downloading tab-delimited, csv, and other files.
 
 
 
 
 
+```{r}
+fileUrl <- "https://data.baltimorecity.gov/api/views/dz54-2aru/rows.csv?accessType=DOWNLOAD"
 
+download.file(fileUrl, destfile = "./data/cameras.csv", method = "curl") #method = curl is necessary for macs
+list.files("./data")
+
+dateDownloaded <- date() #be sure to record when you downloaded
+
+```
+
+if the url starts with http you can use download.file()
+
+if the url starts with https on Windows you may be ok
+
+if the url starts with https on Mac you may need to set method = "curl"
+
+if the file is big, this might take a while
+
+## READING LOCAL FLAT FILES
+
+done in R programming class
+
+read.table()
+
+and read.csv()
+
+and read.csv2()
+
+important params:
+file, header, sep, row.names, nrows
+
+```{r}
+cameraData <- read.csv("./data/cameras.csv")
+```
+
+quote : you can tell R whether there are any quoted values quote="" means no quotes
+
+na.strings - set the character that represents a missing value
+
+nrows - how many rows to read
+skip : number of lines to skip before starting to read
+
+biggest trouble with reading flat files are quotation marks ' or " placed in data values, setting quote = "" often resolves these.
+
+# READING EXCEL FILES
+
+```{r}
+fileUrl <- "https://data.baltimorecity.gov/api/views/dz54-2aru/rows.xlsx?accessType=DOWNLOAD"
+
+download.file(fileUrl, destfile = "./data/cameras.xlsx", method = "curl")
+
+dateDownloaded <- date()
+
+
+
+```
+
+
+you can read specific rows and specific columns
+with
+colIndex <- 2:3
+
+rowIndex <- 1:2
+
+##Swirl Courses
+Intermediate
+
+Regression Models: The basics of regression modeling in R
+Getting and Cleaning Data: dplyr, tidyr, lubridate, oh my!
+
+Advanced
+
+Statistical Inference: This intermediate to advanced level course closely follows the Statistical Inference course of the Johns Hopkins Data Science Specialization on Coursera. It introduces the student to basic concepts of statistical inference including probability, hypothesis testing, confidence intervals and p-values. It concludes with an initiation to topics of particular relevance to big data, issues of multiple testing and resampling.
 
