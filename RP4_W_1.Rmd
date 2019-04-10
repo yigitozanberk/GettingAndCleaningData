@@ -372,6 +372,7 @@ jsonlite vignette
 
 
 ## data.table package
+**another syntax, faster use**
 
 inherets from data.frame
 -all functions that accept data.frame work on data.table
@@ -389,10 +390,79 @@ head(DF, 3)
 DT = data.table(x = rnorm(9), y = rep(c("a", "b", "c"), each = 3), z = rnorm(9))
 head(DT,3)
 
+tables() #see all data frames in memory
+
+DT[2,]
+
+DT[DT$y=="a", ]
+
+DT[c(2,3)] #takes 2nd and 3rd rows
+
+DT[, c(2,3)]
+
+
+
+
 
 ```
 
 
+subsetting function is modified for data.table
+
+argument you pass after the comma is called an expression
+
+in R an expression is a collection of statements enclosed in curley brackets
+
+```{r}
+DT[, list(mean(x), sum(z))]
+DT[, table(y)] #you can perform any function after the comma
+
+DT[, w:=z^2]
+
+DT2 <- DT #still dependent. if you want independent copy you 
+# need the copy function
+
+DT[, m:= {tmp <- (x + z); log2(tmp+5)}]
+DT[, a:=x>0]
+DT[, b:= mean(x+w), by=a]
 
 
 
+```
+.N is an integer length 1, containing the number
+
+```{r}
+set.seed(123)
+DT <- data.table(x=sample(letters[1:3], 1E5, TRUE))
+DT[,.N, by=x] #if you want to count the times each of those letters appear
+
+
+```
+
+KEYS
+
+```{r}
+DT <- data.table(x=rep(c("a", "b", "c"), each=100), y = rnorm(300))
+setkey(DT, x)
+DT['a']#it knows to go and look in the key
+
+#easy merging
+
+DT1 <- data.table(x=c('a', 'a', 'b', 'dt1'), y=1:4)
+DT2 <- data.table(x=c('a', 'b', 'dt2'), z=5:7)
+setkey(DT1, x); setkey(DT2, x)
+merge(DT1, DT2)
+#vuala!
+
+
+```
+you can use keys to facilitate joins
+
+
+very fast reading.
+
+much faster to read files with read.table
+
+
+check
+raphael gottardo's github account
