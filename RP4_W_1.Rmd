@@ -261,3 +261,138 @@ Advanced
 
 Statistical Inference: This intermediate to advanced level course closely follows the Statistical Inference course of the Johns Hopkins Data Science Specialization on Coursera. It introduces the student to basic concepts of statistical inference including probability, hypothesis testing, confidence intervals and p-values. It concludes with an initiation to topics of particular relevance to big data, issues of multiple testing and resampling.
 
+##Reading XML
+
+extensible markup language
+
+frequently used to store structured data
+
+components :
+-markup - labels that give the text structure
+-content - the actual text of the document
+
+start tags <section>
+end tags </section>
+empty tags <line-break />
+
+<greeting> Hello, wrold </greeting>
+
+<img src="jeff.jgp" alt="instructor"/>
+<step number="3"> Connect A to B. </step>
+
+en.wikipedia.org/wiki/XML
+
+```{r}
+library(XML)
+library(RCurl)
+
+fileUrl <- getURL("https://www.w3schools.com/xml/simple.xml")
+doc <- xmlTreeParse(fileUrl, useInternal=TRUE)
+rootNode <- xmlRoot(doc)
+xmlName(rootNode)
+names(rootNode)
+rootNode[[1]] #same way you access a list in R
+rootNode[[1]][[1]] #subsetting to go one level down
+
+xmlSApply(rootNode, xmlValue) #parse an xml object, and give a function to execute
+#rootNode contains the entire document.
+
+
+
+```
+for XPath language 
+
+go to 
+http://www.stat.berkeley.edu/~statcur/Workshop2/Presentations/XML.pdf
+
+
+```{r}
+xpathSApply(rootNode, "//name", xmlValue)
+#gets all of the nodes that correspond to an element titled "name"
+
+xpathSApply(rootNode, "//price", xmlValue)
+
+
+```
+http://espn.go.com/nfl/team/_/name/bal/baltimore-ravens
+
+
+```{r}
+fileUrl <- getURL("http://www.espn.com/nfl/team/_/name/bal/baltimore-ravens")
+
+doc <- htmlTreeParse(fileUrl, useInternal=TRUE)#useInternal to get all internal files
+scores <- xpathSApply(doc, "//li[@class='score']", xmlValue)
+teams <- xpathSApply(doc, "//li[@class='team-name']", xmlValue)
+scores
+
+```
+
+there are XML tutorials on the XML package
+
+##READING JSON
+
+javascript object notation
+
+lightweight data storage
+
+common format for data from application programming interfaces
+
+similar structure to XML but different syntax
+
+data are stored as
+ numbers
+ strings
+ boolean
+ array
+ object
+ 
+```{r}
+jsonData <- fromJSON("https://api.github.com/users/jtleek/repos")
+names(jsonData)
+
+names(jsonData$owner)
+
+jsonData$owner$login
+
+myjson <- toJSON(iris, pretty = TRUE) #turning into json
+cat(myjson)#to print out
+
+iris2 <- fromJSON(myjson)
+head(iris2)
+
+
+```
+ 
+www.json.org
+
+jsonlite tutorial
+
+jsonlite vignette
+
+
+
+## data.table package
+
+inherets from data.frame
+-all functions that accept data.frame work on data.table
+
+written in C so it's much faster
+
+much faster at subsetting, group, and updating
+
+```{r}
+library(data.table)
+DF = data.frame(x = rnorm(9), y = rep(c("a", "b", "c"), each = 3), z = rnorm(9))
+
+head(DF, 3)
+
+DT = data.table(x = rnorm(9), y = rep(c("a", "b", "c"), each = 3), z = rnorm(9))
+head(DT,3)
+
+
+```
+
+
+
+
+
