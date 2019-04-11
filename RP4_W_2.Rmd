@@ -1,0 +1,106 @@
+---
+title: "RP4_W_2"
+author: "yob"
+date: "4/11/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+##mySQL
+www.mysql.com
+
+data are structured in
+-databases
+tables within databases
+fields within tables
+
+data are linked in different data frames with specific value columns
+
+install mysql
+
+install.packages("RMySQL")
+
+```{r}
+ucscDb <- dbConnect(MySQL(), user = "genome", host = "genome-mysql.cse.uscs.edu")
+
+result <- dbGetQuery(ucscDb, "show databases;")
+dbDisconnect(ucscDb)#disconnecting is crucial when working with MySQL servers.
+
+hg19 <- dbConnect(MySQL(), user = "genome", db = "hg19", host = "genome-mysql.cse.ucsc.edu")
+
+allTables <- dbListTables(hg19)
+
+length(allTables) #10949 tables. the advantage of mySQL
+
+allTables[1:5]
+
+dbListFields(hg19, "affyU133Plus2")
+
+dbGetQuery(hg19, "select count(*) from affyU133Plus2")
+
+#counts all the records on the table
+
+affyData <- dbReadTable(hg19, "affyU133Plus2")
+head(affyData)
+
+query <- dbSendQuery(hg19, "select * from affyU133Plus2 where misMatches between 1 and 3")
+#data is usually too big in mySQL so you need to 
+# select the data you need
+
+affyMis <- fetch(query)
+quantile(affyMis$misMatches)
+
+affyMisSmall <- fetch(query, n=10) #only bring top 10 records
+
+dbClearResult(query) #you need to stop the query from that server.
+
+dim(affyMisSmall)
+
+dbDisconnect(hg19)
+
+# REMEMBER TO CLOSE CONNECTION as soon as you don't need it anymore
+
+
+
+
+
+
+
+```
+
+## do not delete, add, or join things from ensembl. only select
+
+in general be careful with mysql commands
+
+#HDF5
+
+used for storing large data sets
+
+hierarchical data format
+
+groups containing zero or more data sets and metadata
+
+
