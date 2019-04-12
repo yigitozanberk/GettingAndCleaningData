@@ -170,3 +170,17 @@ con = url("https://scholar.google.com/citations?user=HI-I6C0AAAAJ&hl=en
 htmlCode = readLines(con)
 ```
 
+Acik olan tablar:
+
+https://www.coursera.org/learn/data-cleaning/lecture/oKUph/reading-from-the-web
+
+https://dev.mysql.com/doc/refman/5.7/en/osx-installation-pkg.html
+
+
+https://www.coursera.org/specializations/mathematics-machine-learning
+
+
+https://github.com/yigitozanberk/GettingAndCleaningData
+
+
+
