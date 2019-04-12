@@ -164,10 +164,23 @@ attempting to read too many pages too quickly can get your IP address blocked
 http://scholar.google.com/citations?user=HI-I6C0AAAAJ&hl=en
 
 ```{r}
-con = url("https://scholar.google.com/citations?user=HI-I6C0AAAAJ&hl=en
+con = url("http://scholar.google.com/citations?user=HI-I6C0AAAAJ&hl=en
 ")
 
 htmlCode = readLines(con)
+
+close(con)
+
+
+library(httr)
+content2 = content(html, as="text")
+
+parsedHtml = htmlParse(content2, asText = TRUE)
+
+xpathSApply(parsedHtml, "//title", xmlValue)
+
+
+
 ```
 
 Acik olan tablar:
@@ -181,6 +194,111 @@ https://www.coursera.org/specializations/mathematics-machine-learning
 
 
 https://github.com/yigitozanberk/GettingAndCleaningData
+
+## OH BE
+
+##DEVAM
+
+#Accessing websites with passwords
+
+```{r}
+pg2 = GET("http://httpbin.org/basic-auth/user/passwd", authenticate("user", "passwd"))
+
+pg2
+
+# using handles
+
+google = handle("http://google.com")
+pg1 = GET(handle = google, path = "/")
+# you won't have to authenticate over and over again thanks to the cookies by using handles.
+
+
+
+
+```
+
+
+#Reading from APIS
+
+application programming interfaces
+
+places to download data
+which users are tweeting, what are they tweeting about.
+
+you can get theese by GET requests
+
+you need HTTR package for this.
+
+you need to create a developers account to be able to do this
+
+myapp = oauth_app("twitter", key = yourConsumerKeyHere, secret =yourConsumerSecretHere)
+
+sig = sign_oauth1.0(myapp, token = yourToken, token_secret = TokenSecret)
+
+homeTL = GET("https://api.twitter.com/1.1/statuses/home_timeline.json", sig)
+
+twitter only supports json at the moment.
+
+
+json1 = content(homeTL)
+json2 = jsonlite::fromJSON(toJSON(json1))
+json2[1, 1:4]
+
+how do you know what url to use
+
+go to the documentation for the twitter api
+
+url and parameters there. you can send those parameters to the API
+
+httr allows GET, POST, PUT, DELETE if you are quthorized
+
+you can authenticate with a user name or a password
+
+httr works well with facebook, google, twitter, githb, etc..
+
+# READING from other sources
+
+google 'data storage mechanism R package'
+like ' MySQL R package'
+
+functions to interact directly with files:
+file - open a connection to a text file
+url
+gzfile
+bzfile
+?connections for more info
+
+'foreign' package
+loads datafrom Minitab, S, SAS, SPSS, Stata, Systat
+
+basic functions read.foo
+
+ex : read.arff, read.dta, etc..
+
+RPostresSQL
+RODBC
+Rmongo
+
+
+
+reading images
+
+jpeg, readbitmap, png, EBImage(Bioconductor)
+
+rdgal, rgeos, raster
+
+reading music: tuneR, seewave
+
+
+Quiz 2 Github API details
+
+ClientID
+4e7afff93ec7e96f3f27
+
+
+ClientSecret
+4051f04d1d80808446f2d76a42608299f382cefc
+
 
 
 

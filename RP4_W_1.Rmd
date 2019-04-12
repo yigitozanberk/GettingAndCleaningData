@@ -298,7 +298,6 @@ xmlSApply(rootNode, xmlValue) #parse an xml object, and give a function to execu
 #rootNode contains the entire document.
 
 
-
 ```
 for XPath language 
 
