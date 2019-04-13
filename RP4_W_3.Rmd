@@ -34,3 +34,536 @@ Note that the `echo = FALSE` parameter was added to the code chunk to prevent pr
 ##WEEK 3
 
 
+Manipulating data
+
+#Subsetting and Sorting
+
+```{r}
+set.seed(13435)
+#create a dataframe with 3 variables
+X <- data.frame("var1" = sample(1:5), "var2" = sample(6:10),
+                "var3"= sample(11:15))
+#scramble variables, make some values missing.
+X <- X[sample(1:5),]
+X$var2[c(1, 3)] = NA
+X
+#randomized dataframe
+
+```
+
+
+```{r}
+#subsetting
+
+X[,1]
+
+X[, "var1"]
+
+X[1:2, "var2"]
+
+#subset using logical
+
+X[(X$var1 <= 3 & X$var3 > 11), ]
+
+X[X$var1 <= 3 | X$var3 > 15, ]
+
+#dealing with missing values. use which command.
+
+X[which(X$var2 >8), ] #doesn't return NAs.
+
+
+
+
+```
+
+#Sorting
+
+```{r}
+sort(X$var1)
+
+sort(X$var1, decreasing = T)
+
+sort(X$var2, na.last = T) #put NA values at the end
+
+
+```
+
+
+#Ordering
+
+```{r}
+X[order(X$var1), ]
+
+#order the data frame according to the acsending order of var1
+
+X[order(X$var1, X$var3), ] #to handle ties.
+
+
+```
+
+#Ordering with plyr
+
+```{r}
+library(plyr)
+
+arrange(X, var1)
+
+arrange(X, desc(var1))
+
+
+```
+
+#Adding rows and columns
+
+```{r}
+X$var4 <- rnorm(5)
+
+X
+
+#added.
+
+#another way
+
+Y <- cbind(X, rnorm(5)) #for binding with columns
+
+Y
+
+
+
+```
+
+further notes : 
+http://www.biostat.jhsph.edu/~ajaffe/lec_winterR/Lecture%202.pdf
+
+
+##Summarizing Data
+
+Key process of data cleaning is summarizing
+
+example data set baltimore restaurants
+
+https://data.baltimorecity.gov/Community/Restaurants/k5ry-ef3g
+
+csv in workspace
+
+```{r}
+restData <- read.csv("Restaurants.csv")
+
+head(restData, n = 3)
+
+tail(restData, n = 3)
+
+summary(restData)
+#one zip code is coded as negative!
+
+str(restData)
+
+nrow(restData)
+
+ncol(restData)
+
+quantile(restData$councilDistrict, na.rm=T)
+
+quantile(restData$councilDistrict, probs = c(0.5, 0.75, 0.9))
+#looking at different probabilities
+
+table(restData$zipCode, useNA = "ifany")
+#making tables
+#looking at specific variables
+#factor analysis
+#useNA will be added as a sepsrate column to show you how many present
+
+table(restData$councilDistrict, restData$zipCode)
+
+#checking for missing values
+
+sum(is.na(restData$councilDistrict))
+
+any(is.na(restData$councilDistrict))
+
+all(restData$zipCode > 0)
+
+colSums(is.na(restData)) #checking column by column
+
+all(colSums(is.na(restData)) == 0)
+
+table(restData$zipCode %in% c("21212"))
+#are there any values that fall into the given vector
+
+table(restData$zipCode%in% c("21212", "21213"))
+
+restData[restData$zipCode %in% c("21212", "21213"), ]
+#creating subsets
+
+#cross tabs, summaries
+
+data(UCBAdmissions)
+
+DF = as.data.frame(UCBAdmissions)
+
+summary(DF)
+
+xt <- xtabs(Freq ~ Gender + Admit, data = DF)
+#Freq is displayed variable against Gender and Admit
+
+warpbreaks$replicate <- rep(1:9, len = 54)
+xt <- xtabs(breaks ~., data = warpbreaks)
+#let's see the breaks variable by all different variables
+
+xt
+
+#flattables
+
+ftable(xt)
+
+fakeData = rnorm(1e5)
+object.size(fakeData)
+
+print(object.size(fakeData), units = "Mb")
+
+
+
+```
+
+
+#Creating New Variables
+
+often raw data won't have a value you are looking for
+
+you will need to transform the data to get the values you would like
+
+common variables to create :
+missingness indicators
+"cutting up" quantitative variables
+applying transforms
+
+```{r}
+restData <- read.csv("Restaurants.csv")
+
+#creating sequences
+
+s1 <- seq(1, 10, by =2)
+
+s1
+
+s2 <- seq(1, 10, length = 3)
+
+s2
+
+x <- c(1, 3, 8, 25, 100)
+
+seq(along = x)
+
+restData$nearMe = restData$neighborhood %in% c("Roland Park",
+                                               "Homeland")
+table(restData$nearMe)
+#creating binary variables
+restData$zipWrong = ifelse(restData$zipCode < 0, TRUE, FALSE)
+
+table(restData$zipWrong, restData$zipCode <0)
+
+#show if there are wrong zip codes
+
+#creating categorical variables
+
+restData$zipGroups = cut(restData$zipCode , breaks = quantile(restData$zipCode))
+#quantiles
+table(restData$zipGroups)
+#quantiles with detailed elements - which is which
+table(restData$zipGroups, restData$zipCode)
+
+
+library(Hmisc)
+
+restData$zipGroups = cut2(restData$zipCode, g = 4)
+
+table(restData$zipGroups)
+
+#it also finds out the quantiles. more properly designed
+
+#creating factor variables
+
+restData$zcf <- factor(restData$zipCode)
+restData$zcf[1:10]
+class(restData$zcf)
+
+#levels of factor variables
+
+yesno <- sample(c("yes", "no"), size = 10, replace = TRUE)
+yesnofac = factor(yesno, levels = c("yes", "no")) #use as yes as the lowest value. if you don't indicate, it arranges itself alphabetically
+relevel(yesnofac, ref = "yes")
+
+as.numeric(yesnofac)
+
+#cutting produces factor variables.
+
+#using the mutate function
+
+restData2 = mutate(restData, zipGroups = cut2(zipCode, g = 4))
+table(restData2$zipGroups)
+
+
+
+
+```
+
+common transforms
+
+abs(x) absolute value
+
+sqrt(x) square root
+
+ceiling(x) ceiling(3.475) is 4
+
+floor(x) floor(3.475) is 3
+
+round(x, digits = n) round(3.475, digits = 2) is 3.48
+
+signif(x, digits = n) signif(3.475, digits = 2) is 3.5
+
+cos(x), sin(x) etc
+
+log(x) natural logarithm
+
+log2(x), log10(x) other common logs
+
+exp(x) exponentiating x
+
+www.biostat.jhsph.edu/~ajaffe/lec_winterR/Lecture%202.pdf
+
+statmethods.net/management/functions.html
+
+
+##plyr tutorial
+
+http://plyr.had.co.nz/09-user/
+
+##Reshaping Data
+
+goal is tidy data
+
+each variable forms a column
+each observation forms a row
+each talbe/file stores data about one kind of observation(e.g. people/hospitals)
+
+```{r}
+library(reshape2)
+head(mtcars)
+
+#melting data frames
+mtcars$carname <- rownames(mtcars)
+#which are id variables, which are measure variables
+carMelt <- melt(mtcars, id = c("carname", "gear", "cyl"), measure.vars = c("mpg", "hp"))
+head(carMelt, n=3)
+
+#casting data frames
+
+cylData <- dcast(carMelt, cyl ~ variable)
+cylData
+#for 4 cylinders, we have 11 measures of mpg, and 11 measures of hp, etc.. "how many measurements for each cylinder"
+
+cylData<- dcast(carMelt, cyl ~ variable, mean)
+cylData
+#mean for each cylinder
+
+
+#averaging values
+
+head(InsectSprays)
+
+tapply(InsectSprays$count, InsectSprays$spray, sum)
+#i want to see the sums of each column
+
+spIns = split(InsectSprays$count, InsectSprays$spray)
+spIns
+
+sprCount <- lapply (spIns, sum)
+sprCount
+
+unlist(sprCount)
+
+sapply(spIns, sum)
+
+#plyr package
+
+library(plyr)
+
+ddply(InsectSprays, .(spray), summarise, sum = sum(count))
+
+head(spraySums)
+
+spraySums <- ddply(InsectSprays ,.(spray), summarise, sum = ave(count, FUN = sum))
+# sum -> calculating the sum as ave function applied to count, then added up.
+
+
+#suppose you want to be able to subtract the mean or total count from specific counts.
+
+dim(spraySums)
+#same dimension as original data
+
+#everytime you see an A in the spray, you get the sum for all of the A values.
+
+
+
+
+
+```
+
+
+for more information of reshaping data:
+
+www.slideshare.net/jeffreybeen/reshaping-data-in-r
+
+plyr primer:
+
+www.r-bloggers.com/a-quick-primer-on-split-apply-combine-problems/
+
+tutorial from developer of plyr
+http://plyr.had.co.nz/09-user/
+
+see also functions :
+-acast - for casting as multi-dimensional arrays
+-arrange - for faster reordering without using order() commands
+-mutate- adding new variables
+
+# sort mtcars data by cylinder and displacement
+mtcars[with(mtcars, order(cyl, disp)), ]
+# Same result using arrange: no need to use with(), as the context is implicit
+# NOTE: plyr functions do NOT preserve row.names
+arrange(mtcars, cyl, disp)
+
+## dplyr
+
+specifically designed to help work with dataframes
+
+arrange
+filter
+select
+mutate
+rename
+
+dataframes are key structures
+there is one observation per row
+each column represents a variable or measure or characteristics
+primary implementation that you will use is the default R implementation
+other implementations particularly relational databases systems
+
+dplyr is very fast. greatly simplifies existing functionality in R
+
+provides "grammar" 
+
+-select : returns a subset of the columns of a data frame
+-filter : extract a subset of rows from a data frame based on logical conditions
+-arrange : reorder rows of a data frame
+-rename : rename variables in a data frame
+-mutate : add new variables/columns or transform existing variables
+-summarise : generate summary statistics of different variables in the data frame, possibly within strata
+
+
+first argument is always data frame
+
+subsequents describe what to do with it, you can refer to columns in the data frame directly without using the $ operator(just use the names)
+
+result is a new data frame
+
+data frames must be properly formatted and annotated
+
+#basic tools
+
+```{r}
+library(dplyr)
+library(datasets)
+chicago <- readRDS("chicago.rds")
+
+dim(chicago)
+
+str(chicago)
+
+names(chicago)
+
+head(select(chicago, city:dptp))
+#selects all columns between city and dptp. you don't need to use $ operator
+
+head(select(chicago, -(city:dptp)))
+#show all columns except the ones annotated.
+
+i <- match("city", names(chicago))
+j <- match("dptp", names(chicago))
+
+head(chicago[, -(i:j)])
+
+#filter function
+
+chic.f <- filter(chicago, pm25tmean2 > 30 )
+
+head(chic.f, 10)
+
+#subsetting more tha none variable
+chic.f <- filter(chicago, mp25tmean2 > 30 & tmpd > 80)
+
+head(chic.f)
+
+#arrange function
+
+chicago <- arrange(chicago, date)
+
+head(chicago)
+
+tail(chicago)
+
+chicago <- arrange(chicago, desc(date))
+
+head(chicago)
+
+#rename function
+
+chicago <- rename(chicago, pm25 = pm25tmean2, dewpoint = dptp)
+
+head(chicago)
+
+#mutate function
+
+chicago <- mutate(chicago, pm25detrend = pm25-mean(pm25, na.rm = TRUE))
+head(select(chicago, pm25, pm25detrend))
+
+# groupby function 
+
+chicago <- mutate(chicago, tempcat = factor( 1 * (tmpd > 80), labels = c("cold", "hot")))
+
+hotcold <- group_by(chicago, tempcat)
+
+hotcold
+
+summarize(hotcold, pm25 = mean(pm25, na.rm = T), o3 = max(o3tmean2), no2 = median(no2tmean2))
+
+#categorize by other variables
+
+chicago <- mutate(chicago, year = as.POSIXlt(date)$year + 1900)
+years <- group_by(chicago, year)
+
+summarize(years, pm25 = mean(pm25, na.mr = T), o3 = max(o3tmean2), no2 = median(no2tmean2))
+
+#dplyr can chain operations
+
+# %>% "pipeline operator"
+
+chicago %>% mutate(month = as.POSIXlt(date)$mon + 1) %>% group_by(month) %>% summarize(pm25 = mean(pm25, na.rm = T), o3 = max(o3tmean2), no2 = median(no2tmean2))
+
+#you don't need to use temporary variables this way
+
+
+
+```
+
+
+once you learn the dplyr grammar there are a few additional benefits
+
+dplyr can work with other data frame backends
+
+data.table for large fast tables
+
+SQL interface for relational databases via the DBI package
+
+
+
+
