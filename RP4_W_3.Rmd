@@ -566,4 +566,132 @@ SQL interface for relational databases via the DBI package
 
 
 
+#Merging Data
 
+sometimes you need to merge datasets.
+
+
+```{r}
+if(!file.exists("./data")){dir.create("./data")}
+fileUrl1 ="http://www.sharecsv.com/dl/e70e9c289adc4b87c900fdf69093f996/reviews.csv"
+fileUrl2 ="http://www.sharecsv.com/dl/0863fd2414355555be0260f46dbe937b/solutions.csv"
+download.file(fileUrl1,destfile = "./data/reviews.csv", mode="wb")
+download.file(fileUrl2,destfile = "./data/solutions.csv", mode="wb")
+reviews <- read.csv("./data/reviews.csv")
+solutions <- read.csv("./data/solutions.csv")
+head(reviews, 2)
+
+head(solutions, 2)
+
+#merging data frames
+
+names(reviews)
+
+names(solutions)
+
+#important parameters x, y, by, by.x, by.y, all
+
+#by default it tries to merge using all variables that
+#have the same name. even though they are not the same...
+
+mergedData <- merge(reviews, solutions, by.x = "solution_id", by.y = "id", all = T)
+
+head(mergedData)
+
+#ordered by the by.x variable. 
+
+#default is merged all common column names
+
+intersect(names(solutions), names(reviews))
+
+mergedData2 <- merge(reviews, solutions, all = T)
+head(mergedData2)
+
+#the problem is, id variable matches up, but 'start' and 'stop' variables do not match %100. 
+
+#just creates a data frame that is larger. one for each row of reviews and each row of solutions.
+
+
+
+```
+
+```{r}
+#using join from plyr package
+
+library(plyr)
+df1 <- data.frame(id = sample(1:10), x = rnorm(10))
+df2 <- data.frame(id = sample(1:10), y = rnorm(10))
+arrange(join(df1, df2), id)
+
+#if you have multiple datasets to merge, it is hard to do it with the 'merge' function. but plyr package makes it easy
+
+df3 <- data.frame(id = sample(1:10), z = rnorm(10))
+
+dfList <- list(df1, df2, df3)
+join_all(dfList)
+
+#joins all by id
+
+
+
+```
+
+library(swirl)
+install_course("Course Name Here")
+swirl()
+
+www.plosone.org/article/info:doi/10.1371/journal.pone.0026895
+
+
+#Beginner
+
+R Programming: The basics of programming in R
+R Programming E: Same as the original, but modified slightly for in-class use (see below ***)
+The R Programming Environment
+*** R Programming E is identical to R Programming, except we've eliminated the prompts for Coursera credentials at the end of each lesson and instead give students the option to send an email to their instructor notifying them of completion. Admittedly, it's sort of a hack until we come up with a more robust solution for in-class use (i.e. an instructor "dashboard").
+
+#Intermediate
+
+Regression Models: The basics of regression modeling in R
+Getting and Cleaning Data: dplyr, tidyr, lubridate, oh my!
+
+#Advanced
+
+Statistical Inference: This intermediate to advanced level course closely follows the Statistical Inference course of the Johns Hopkins Data Science Specialization on Coursera. It introduces the student to basic concepts of statistical inference including probability, hypothesis testing, confidence intervals and p-values. It concludes with an initiation to topics of particular relevance to big data, issues of multiple testing and resampling.
+Advanced R Programming
+Since our users come from a variety backgrounds, it's very hard to label material as Beginner, Intermediate, or Advanced. If you find something that is labelled Beginner to be challenging, please don't be discouraged. The first step of learning anything is to acknowledge that you are capable of understanding it. True understanding will come with time and practice.
+
+
+## Swirl Notes
+
+From ?tbl_df, "The main advantage to using a tbl_df over a regular data frame is the printing."
+
+
+subset columns with select(cran, X:size)
+
+subset row with filter(cran, package == "swirl")
+
+filter(cran, !is.na(r_version))
+
+ordering rows by arrange()
+
+arrange(cran, ip_id)
+arrange(cran, desc(ip_id))
+arrange(cran2, country, desc(r_version), ip_id)
+
+modifying variables with mutate()
+
+creating a size column in terms of mb by using the "size" variable
+
+mutate(cran3, size_mb = size / 2^20)
+
+mutate(cran3, correct_size = size + 1000)
+
+collapsing the dataset into a single row summarize()
+
+summarize(cran, avg_bytes = mean(size))
+
+gives the average download size depending on the data in the size varuable
+
+
+mutate(cran3, size_mb = size / 2^20)
