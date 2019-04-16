@@ -1005,3 +1005,159 @@ sat %>%
 
 #mind == blown
 
+
+
+
+
+##data.table
+
+mtcarsDT[
+        mpg > 20, # i = all rows where mpg greater than 20
+        .(AvgHP = mean(hp), # j = average horse power and the minimum weight
+        "MinWT(kg)" = min(wt*453.6)),
+        by = .(cyl, under5gears = gear<5) # by = while grouping the rows by cylinder, and wether cars have 5 gears or not
+
+]
+
+Take DT, subset rows using i, then calculate j grouped by by. 
+
+
+```{r}
+DT <- data.table(A = 1:6, B = c("a", "b", "c"), C = rnorm(6), D = TRUE)
+
+DT
+
+
+
+```
+
+character vectors in R are quite efficient due to R's global cache.
+
+```{r}
+DT[3:5, ]
+
+class(DT)
+
+#accepted as data.frame by other packages
+
+#DT looks to see where it is called from
+#redirects to DF if the package doesn't know 
+#about DT
+
+
+
+```
+
+
+
+Also, keep in mind that the special symbol .N, when used inside square brackets, contains the number of rows. 
+
+
+# Print a new data.table containing rows 2, 2, and 3 of DT
+print(DT[c(2,2,3)])
+
+
+#selecting columns in j
+
+```{r}
+DT[, .(B, C)]
+
+DT[, .(Total = sum(A), Mean = mean(C))]
+
+DT[, .(B, C = sum(C))]
+
+DT[, plot(A,C)]
+
+DT[, 
+   {
+           print(A)
+           hist(C)
+           NULL
+   }
+   
+   ]
+#you can put any function inside j
+
+
+```
+
+.() is an alias to list() in data.table
+
+
+D <- 5
+
+Well done! Column D does not exist in DT and is thus not seen as a variable. This causes data.table to look for D in DT's parent frame. Also note that .() in j always returns a data.table.
+
+```{r}
+ ans2 <- DT[, .(B, val = c(C, A))]
+ans2
+#B gets recycled 
+```
+
+
+```{r}
+DT <- data.table(A = c(1, 2, 3, 4, 5),
+                 B = c(10, 11, 12, 13, 14))
+
+DT[, .(MySum = sum(B), MyMean = mean(B)), 
+    by = .(A)
+   ]
+
+
+DT[, .(MySum = sum(B)), by = .(Grp = A%%2)]
+# %% operator means modulo 2 = the number is odd or even
+
+# shortcut
+
+# if you have only one item in j or by, you don't need to use the dot and paranteses
+
+DT[ 2:4, sum(B), by = A%%2]
+
+
+
+```
+
+```{r}
+# iris is already available in your workspace
+
+# Convert iris to a data.table: DT
+DT <- data.table(iris)
+
+# For each Species, print the mean Sepal.Length
+DT[, mean(Sepal.Length), by = Species]
+
+# Print mean Sepal.Length, grouping by first letter of Species
+DT[, mean(Sepal.Length), by = substr(Species, 1, 1)]
+
+
+```
+
+
+```{r}
+DT[, .N , by = 10 * round(Sepal.Length * Sepal.Width / 10)]
+
+# Group the specimens by Sepal area (to the nearest 10 cm2) and count how many occur in each group
+
+DT[,  .(Count = .N) , by = .( Area = 10 * round(Sepal.Length * Sepal.Width / 10))]
+
+
+```
+
+Count how many occur in each group by specifying .N in j. Simply print the resulting data.table. Use the template in the sample code by filling in the blanks.
+
+
+```{r}
+# Create the data.table DT
+DT <- data.table(A = rep(letters[2:1], each = 4L), 
+                 B = rep(1:4, each = 2L), 
+                 C = sample(8))
+
+# Create the new data.table, DT2
+DT2 <- DT[, .(C = cumsum(C)), by = .(A, B)]
+
+# Select from DT2 the last two values from C while you group by A
+DT2[, j = .(C =  tail(C,2)), by= A]
+
+
+```
+
