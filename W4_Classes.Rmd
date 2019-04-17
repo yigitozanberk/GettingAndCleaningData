@@ -1,0 +1,357 @@
+---
+title: "W4_Rmd"
+author: "yob"
+date: "4/17/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+##Week 4
+
+Editing text variables
+
+regular expressions
+
+working with dates
+
+#Editing text variables
+
+a very common data cleaning step. extra spaces, commas, etc.
+
+```{r}
+cameraData <- read.csv("./data/cameras.csv")
+
+names(cameraData)
+
+tolower(names(cameraData))
+#to avoid errors in the future. you might forget the uppercase details
+
+splitNames = strsplit(names(cameraData), "\\.")#for location.1
+#\\. because period is a reserved character
+splitNames[[5]]
+
+splitNames[[6]]
+#it has split into two names
+
+mylist <- list(letters = c("A", "b", "c"), numbers = 1:3, matrix(1:25, ncol = 5))
+
+head(mylist)
+
+mylist[1]
+
+#to remove all periods
+
+splitNames[[6]][1]
+
+firstElement <- function(x) {x[1]}
+sapply(splitNames, firstElement)
+#then you can store it in a new vector and get to names of the variables
+
+#it works because:
+
+splitNames #is a list.
+
+reviews <- read.csv("./data/reviews.csv")
+solutions <- read.csv("./data/solutions.csv")
+
+head(reviews, 2)
+
+sub("_", "", names(reviews), )
+#whereever you find an underscore, replace it with "" (nothing)
+
+testName <- "this_is_a_test"
+
+sub("_", "", testName)
+#removes only one
+
+gsub("_", "", testName)
+#removes all
+
+
+
+
+```
+
+
+
+```{r}
+#finding values grep() grepl()
+
+grep("Alameda", cameraData$intersection)
+
+#grep takes a string, and searches for it in the intersection variables. 
+
+table(grepl("Alameda", cameraData$intersection))
+
+#creates a logical vector of where the string appears
+
+#used for subsetting
+cameraData2 <- cameraData[!grepl("Alameda", cameraData$intersection), ]
+
+#intersections without Alameda
+
+
+grep("Alameda", cameraData$intersection, value = T)
+
+#value = T makes grep return the values where the serach string appears
+
+grep("JeffStreet", cameraData$intersection)
+
+length(grep("JeffStreet", cameraData$intersection))
+
+#nice way to check and see if a particular value appears in a vector
+
+library(stringr)
+
+nchar("Jeffrey Leek")
+
+#returns number of characters
+
+substr("Jeffrey Leek", 1, 7)
+
+paste("Jeffrey", "Leek", sep = ",")
+
+str_trim("Jeff      ")
+#trims of excess space
+
+
+
+
+```
+
+
+#names of variables should be 
+- all lower case when possible
+-descriptive(diagnosis versus Dx)
+-not duplicated
+-not have underscores or dots or white spaces
+
+variables with character values
+-should usually be made into factor variables(depends on application)
+-should be descriptive(use TRUE/FALSE instead of 0/1 and Male/Female versus 0/1 or M/F)
+
+
+## Regular Expressions
+
+regular expressions can be though as a combination of literals and metacharacters
+
+literals <- matches exactly. obama, obama, obama. not Obama, or oBama
+
+we need to express whitespace word boundaries, sets of literals...
+
+some metacharacters represent the start of a line.
+
+# ^i think 
+
+will match all expressions beginning with this expression
+
+i think my car...
+i think i love...
+i think this mor....
+
+# morning$
+
+represents the end of the line
+
+.... had something this morning
+...had the morning
+....morning
+
+
+we can list a set of characters we will accept at a given point in the match
+
+# [Bb][Uu][Ss][Hh]
+
+will match the lines
+
+..... "Name the worst thing about Bush!"
+..... desert creosote bush, brownies, BBQ chicken
+.... and bushwalking at molonglo gorge
+Bush told you that north...
+I'm listening to Bush - Hurricane (Album)
+
+and will match all.
+
+
+
+then, you can start combining
+
+# ^[Ii] am
+
+will match:
+
+i am so angry at my....
+i am boycotting....
+I am twitt...
+I am a very....
+
+
+you can specify a range of letters or characters. the order doesn't matter
+
+[a-z] or [a-zA-Z]
+
+# ^[0-9][a-zA-Z]
+
+will match the lines
+
+7th inning..
+2nd half.....
+3am.....
+5ft 7 sent....
+1st sign.....
+
+
+# [^?.]$              
+here we're looking at the end of the line($). we're looking for any line that ends in anything that ends with anything other than a period or a question mark.
+
+i like basketballs
+6 and 9
+dont worry... we all die anyway!
+Not in Baghdad
+helicopter under water? hmm
+
+
+
+
+"." is used to refer to any character.
+
+# 9.11 
+
+will match the lines
+
+its stupid the post 9-11 rules
+if any 1 of us did 9:11 we would b
+169.114.677
+sings : 0009911975
+
+
+"or" metacharacter
+
+# flood|fire
+
+will match:
+
+is firewire like usb...
+the global flood...
+it will match fire or flood
+
+
+# flood|earthquake|hurricane|coldfire
+you can include up to any number of alternatives
+
+alternatives can be real expressions 
+
+# ^[Gg]ood|[Bb]ad
+
+here we are searching good at the beginning of the line, or bad in anywhere of the line
+
+# ^([Gg]ood|[Bb]ad)
+
+here the expression both has to be in the beginning
+
+
+# [Gg]eorge( [Ww]\.)? [Bb]ush
+question mark indicates that the indicated expression is optional
+
+i bet i can spell better than george bush 
+BBC reported that George W. Bush claimed
+a bird in the hand is worth two george bushes
+
+you have to add the backslash before the dot. otherwise the code accepts it as a metacharacter. you have to excape with the \ operator before the dot.
+
+* and + signs are metacharacters used to indicate repetition: * means "any number, including none, of the item" and + means "at least one of the item"
+
+# (.*)
+
+will match the lines
+
+anyone wanna chat?(24, m, germany)
+hello, 20.m here... ( east area + drives + webcam)
+(he means older men)
+()
+
+
+[0-9]+ (.*)[0-9]+
+
+at least one number, followed by any number of characters followed by at least one number again
+
+working as MP here 720 mp battallion, 42nd birgade
+so say 2 or 3 years
+it went down for like, 3 or 4 days
+mmm its time 4 me 2 go 2 bed
+
+
+we can use { and } as interval quantifiers : they let us specify the minimum and maximum number of matches of an expression
+
+[Bb]ush( +[^ ]+ +){1,5} debate
+
+will match the lines
+
+Bush has historically won all major debates he's done.
+in my view, Bush doesn't need these debates..
+bush doesn't need the debates? maybe you are right
+That's what Bush supporters are doing about the debate.
+
+bush, at least one space, followed by something that's not a space, followed by at least one space, I wanna see that between one and five times. we want to see something like space word space. up between one and five times.
+
+
+m,n ->means at least m but not more than n matches
+m ->means exactly m matches
+m, ->means at least m matches
+
+# \1 and \2 refers to previous expressions in parantheses
+
+ +([a-zA-Z]+) +\1 +
+
+means: we're looking for is a space followed by some-at least one but possibly more characters, followed by at least one space, followed by the exact same match that we saw within the paranthesis, followed by at least one space
+
+night night twitter!
+blah blah blah
+my tattoo is so so itchy today
+
+in short, it searches for repetitions
+
+* is greedy so it always matches the longest possible string that satisfies the regular expression
+
+^s(.*)s
+-> we're starting at the beginning of a string and we're looking for an s followed by characters, followed by s.
+matches the whole expressions down there
+
+sitting at starbucks 
+setting up mysql and rails
+studying stuff for the exams
+
+
+to make it less greedy
+
+^s(.*?)s$
+
+->? changes the greediness. it does not try to findthe maximum length of the string
+
+
+
+
+
