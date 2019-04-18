@@ -352,6 +352,188 @@ to make it less greedy
 ->? changes the greediness. it does not try to findthe maximum length of the string
 
 
+##Working with Dates
+
+```{r}
+d1 <- date()
+
+d1
+
+d2 <- Sys.Date()
+
+d2
+
+class(d2)
+
+
+```
+
+formatting dates
+
+%d <- day as number(0-31)
+
+%a <- abbreviated weekday
+
+%A <- unabbreviated weekday
+
+%m <- month(00-12)
+
+%b <- abbreviated month
+
+%B <- unabbreviated month
+
+%y <- 2 digit year
+
+%Y <- 4 digit year
+
+```{r}
+
+format(d2, "%a %b %d")
+
+format(d2, "%A %B %d")
+
+x <- c("1jan1960", "2jan1960", "31mar1960", "30jul1960")
+
+z <- as.Date(x, "%d%b%Y")
+
+z
+
+z[1] - z[2]
+
+#getting number from date difference
+as.numeric(z[1] - z[2])
+
+weekdays(d2)
+
+months(d2)
+
+julian(d2)
+
+library(lubridate)
+
+ymd("20140108")
+#year, month, day
+
+mdy("08/04/2013")
+#month, day, year
+
+dmy("03-04-2013")
+#day, month, year
+
+
+ymd_hms("2011-08-03 10:15:03")
+#year day month, hours minutes seconds
+
+ymd_hms("2011-08-03 10:15:03", tz = "Europe/Istanbul")
+
+?Sys.timezone
+
+TZ <- Sys.timezone()
+
+x <- dmy(c("1jan2013", "2jan2013", "31mar2013", "30jul2013"))
+
+wday(x[1])
+
+wday(x[1], label = T)
+
+
+
+```
+
+lubridate tutorial for more information on r-statistics
+
+?POSIXct, ?POSIXlt
+
+
+
+
+##Data Resources
+Open Government Sites
+
+United Nations 
+http:/data.un.org/
+
+U.S.
+http://www.data.gov/
+ - list of cities/states with open data
+
+United Kingdom
+http://data.gov.uk/
+
+France
+http://www.data.gouv.fr/
+
+Ghana
+http://data.gov.gh/
+
+Australia
+http://data.gov.au/
+
+Germany
+https://www.govdata.de/
+
+Hong Kong
+http://www.gov.hk/en/theme/psi/datasets/
+
+Japan
+http://www.data.go.jp/
+
+many more
+http://www.data.gov/opendatasites
+
+
+
+#gapminder
+
+http://www.gapminder.org/
+
+about human health
+
+#survey data from united states
+
+http://www.asdfree.com/
+
+#infochimps
+
+http://www.infochimps.com/marketplace
+
+##kaggle
+competitions
+http://www.kaggle.com/
+
+
+##Collections by data scientists
+
+Hilary Mason
+http://bitly.com/bundles/hmason/1
+
+Peter Skomoroch
+http://delicious.com/pskomoroch/dataset
+
+Jeff Hammerbacher
+http://www.quora.com/Jeff-Hammerbacher/Introduction-to-Data-Science-Data-Sets
+
+Gregory Piatetsky-Shapiro
+http://www.kdnuggets.com/gps.html
+
+
+http://blog.mortardata.com/post/67652898761/6-dataset-list-curated-by-data-scientists
+
+
+Stanford large network data
+
+UCI machine learning
+
+KDD nugets datasets
+
+cmu statlib
+
+gene expression omnibus
+
+arxiv data
+
+public data sets on amazon web services
+
 
 
 
