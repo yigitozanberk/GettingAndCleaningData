@@ -535,5 +535,56 @@ arxiv data
 public data sets on amazon web services
 
 
+##Swirl notes of the week
+
+#Dates times with lubridate
+
+```{r}
+help(package = lubridate)
+
+
+```
+
+| We can also get the day of the week from this_day using the wday() function. It will be represented as a number, such that
+| 1 = Sunday, 2 = Monday, 3 = Tuesday, etc. Give it a shot.
+
+| The update() function allows us to update one or more components of a date-time. For example, let's say the current time is
+| 08:34:55 (hh:mm:ss). Update this_moment to the new time using the following command:
+| 
+| update(this_moment, hours = 8, minutes = 34, seconds = 55).
+
+| It's important to recognize that the previous command does not alter this_moment unless we reassign the result to
+| this_moment. To see this, print the contents of this_moment.
+
+| For a complete list of valid time zones for use with lubridate, check out the following Wikipedia page:
+| 
+| http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+
+| Your flight is the day after tomorrow (in New York time), so we want to add two days to nyc. One nice aspect of lubridate
+| is that it allows you to use arithmetic operators on dates and times. In this case, we'd like to add two days to nyc, so we
+| can use the following expression: nyc + days(2). Give it a try, storing the result in a variable called depart.
+
+| The with_tz() function returns a date-time as it would appear in another time zone. Use ?with_tz to check out the
+| documentation.
+
+| Fast forward to your arrival in Hong Kong. You and your friend have just met at the airport and you realize that the last
+| time you were together was in Singapore on June 17, 2008. Naturally, you'd like to know exactly how long it has been.
+
+how_long <- interval(start = last_time, end = arrive)
+
+as.period(how_long)
+
+[1] "10y 10m 4d 21H 24M 32S"
+
+| This is where things get a little tricky. Because of things like leap years, leap seconds, and daylight savings time, the
+| length of any given minute, day, month, week, or year is relative to when it occurs. In contrast, the length of a second is
+| always the same, regardless of when it occurs.
+
+...
+
+  |================================================================================================================    |  97%
+| To address these complexities, the authors of lubridate introduce four classes of time related objects: instants,
+| intervals, durations, and periods. These topics are beyond the scope of this lesson, but you can find a complete discussion
+| in the 2011 Journal of Statistical Software paper titled 'Dates and Times Made Easy with lubridate'.
 
 
